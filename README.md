@@ -1,6 +1,6 @@
 # tracelm-java-agent
 
-![TraceLens Banner](banner.png)
+![TraceLM Banner](banner.png)
 
 TraceLM – LLM Observability for Java (Agent-Based, Zero Code Changes)
 
