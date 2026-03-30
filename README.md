@@ -31,3 +31,111 @@ Receives traces
 Aggregates metrics
 demo-app (optional)
 Sample app using LangChain4J
+
+✨ Features
+🔍 Non-intrusive tracing (no code changes required)
+⚡ Latency tracking (per request)
+🧠 Model detection (auto-extracted)
+❌ Error tracking
+📊 Metrics API (total requests, avg latency, p95 latency)
+🧵 Thread-safe collector
+🚀 Lightweight and extensible
+
+📦 Project Structure
+trace-lens/
+ ├── llm-agent/
+ ├── llm-collector/
+ ├── demo-app/
+ ├── README.md
+
+⚙️ How It Works
+Java Agent intercepts LLM calls
+Extracts:
+traceId
+latency
+model
+status
+Sends data to collector via HTTP
+Collector stores and exposes metrics
+
+▶️ Getting Started
+1️⃣ Build the Project
+mvn clean install
+
+2️⃣ Start Collector
+cd llm-collector
+mvn quarkus:dev
+
+Collector runs at:
+
+http://localhost:8080
+
+3️⃣ Run Application with Agent
+java -javaagent:llm-agent/target/llm-agent.jar -jar demo-app/target/demo-app.jar
+
+📡 API Endpoints
+🔹 Get All Traces
+GET /traces
+
+📡 API Endpoints
+🔹 Get All Traces
+GET /traces
+
+📊 Sample Metrics Response
+{
+  "totalRequests": 120,
+  "successCount": 110,
+  "errorCount": 10,
+  "avgLatency": 45.3,
+  "p95Latency": 120
+}
+
+🧠 Trace Schema
+{
+  "traceId": "string",
+  "timestamp": 123456789,
+  "latency": 17,
+  "model": "openai/gpt-oss-120b",
+  "promptLength": 120,
+  "responseLength": 800,
+  "status": "success",
+  "error": null
+}
+🔒 Design Principles
+🚫 No application code changes
+⚡ Minimal overhead
+🔐 Privacy-first (response not stored)
+🧩 Extensible architecture
+
+🔒 Design Principles
+🚫 No application code changes
+⚡ Minimal overhead
+🔐 Privacy-first (response not stored)
+🧩 Extensible architecture
+
+🚀 Roadmap
+📊 Dashboard UI
+📦 Persistent storage (PostgreSQL / ClickHouse)
+🔢 Token tracking
+📉 Time-series metrics
+🔔 Alerting
+
+🤝 Contributing
+
+Contributions are welcome! Feel free to open issues or submit pull requests.
+
+📜 License
+
+MIT License
+
+⭐ If you like this project
+
+Give it a star ⭐ — it helps others discover it!
+
+
+
+
+
+
+
+
