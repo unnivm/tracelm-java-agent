@@ -21,29 +21,48 @@ All data is sent to a collector service for aggregation and analysis.
 🏗️ Architecture
 
 Application → Java Agent → HTTP → Collector → Metrics API
+
 Components
+
 llm-agent
+
 Java Agent using ByteBuddy
+
 Intercepts LLM calls
+
 Extracts metadata (latency, model, status)
+
 llm-collector
+
 Quarkus-based REST service
+
 Receives traces
+
 Aggregates metrics
+
 demo-app (optional)
+
 Sample app using LangChain4J
 
 ✨ Features
 
 🔍 Non-intrusive tracing (no code changes required)
+
 ⚡ Latency tracking (per request)
+
 🧠 Model detection (auto-extracted)
+
 ❌ Error tracking
+
 📊 Metrics API (total requests, avg latency, p95 latency)
+
 🧵 Thread-safe collector
+
 🚀 Lightweight and extensible
 
+
 📦 Project Structure
+
 trace-lens/
  ├── llm-agent/
  ├── llm-collector/
@@ -51,7 +70,9 @@ trace-lens/
  ├── README.md
 
 ⚙️ How It Works
+
 Java Agent intercepts LLM calls
+
 Extracts:
 traceId
 latency
