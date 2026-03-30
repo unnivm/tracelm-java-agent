@@ -19,6 +19,7 @@ TraceLens captures:
 All data is sent to a collector service for aggregation and analysis.
 
 🏗️ Architecture
+
 Application → Java Agent → HTTP → Collector → Metrics API
 Components
 llm-agent
@@ -33,6 +34,7 @@ demo-app (optional)
 Sample app using LangChain4J
 
 ✨ Features
+
 🔍 Non-intrusive tracing (no code changes required)
 ⚡ Latency tracking (per request)
 🧠 Model detection (auto-extracted)
