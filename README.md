@@ -74,19 +74,29 @@ trace-lens/
 Java Agent intercepts LLM calls
 
 Extracts:
+
 traceId
+
 latency
+
 model
+
 status
+
 Sends data to collector via HTTP
+
 Collector stores and exposes metrics
 
 ▶️ Getting Started
+
 1️⃣ Build the Project
+
 mvn clean install
 
 2️⃣ Start Collector
+
 cd llm-collector
+
 mvn quarkus:dev
 
 Collector runs at:
@@ -94,17 +104,20 @@ Collector runs at:
 http://localhost:8080
 
 3️⃣ Run Application with Agent
+
 java -javaagent:llm-agent/target/llm-agent.jar -jar demo-app/target/demo-app.jar
 
 📡 API Endpoints
+
 🔹 Get All Traces
+
 GET /traces
 
 📡 API Endpoints
-🔹 Get All Traces
-GET /traces
+
 
 📊 Sample Metrics Response
+
 {
   "totalRequests": 120,
   "successCount": 110,
@@ -113,7 +126,9 @@ GET /traces
   "p95Latency": 120
 }
 
+
 🧠 Trace Schema
+
 {
   "traceId": "string",
   "timestamp": 123456789,
@@ -124,34 +139,43 @@ GET /traces
   "status": "success",
   "error": null
 }
-🔒 Design Principles
-🚫 No application code changes
-⚡ Minimal overhead
-🔐 Privacy-first (response not stored)
-🧩 Extensible architecture
 
 🔒 Design Principles
+
 🚫 No application code changes
+
 ⚡ Minimal overhead
+
 🔐 Privacy-first (response not stored)
+
 🧩 Extensible architecture
+
 
 🚀 Roadmap
+
 📊 Dashboard UI
+
 📦 Persistent storage (PostgreSQL / ClickHouse)
+
 🔢 Token tracking
+
 📉 Time-series metrics
+
 🔔 Alerting
 
 🤝 Contributing
 
 Contributions are welcome! Feel free to open issues or submit pull requests.
 
+
 📜 License
+
 
 MIT License
 
+
 ⭐ If you like this project
+
 
 Give it a star ⭐ — it helps others discover it!
 
