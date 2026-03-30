@@ -18,3 +18,16 @@ TraceLens captures:
 
 All data is sent to a collector service for aggregation and analysis.
 
+🏗️ Architecture
+Application → Java Agent → HTTP → Collector → Metrics API
+Components
+llm-agent
+Java Agent using ByteBuddy
+Intercepts LLM calls
+Extracts metadata (latency, model, status)
+llm-collector
+Quarkus-based REST service
+Receives traces
+Aggregates metrics
+demo-app (optional)
+Sample app using LangChain4J
