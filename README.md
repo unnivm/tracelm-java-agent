@@ -2,6 +2,8 @@
 
 ![TraceLM Banner](banner.png)
 
+# Tracelm Demo
+
 ![TraceLM Demo](demo.gif)
 
 
