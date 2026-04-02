@@ -2,6 +2,9 @@
 
 ![TraceLM Banner](banner.png)
 
+![TraceLM Demo](demo.gif)
+
+
 TraceLM – LLM Observability for Java (Agent-Based, Zero Code Changes)
 
 Gain deep visibility into your LLM calls — track latency, errors, and model usage with zero code changes.
