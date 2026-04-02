@@ -131,6 +131,16 @@ GET /traces
 
 📊 Sample Metrics Response
 
+## 📊 Metrics You Get
+
+- Total requests
+- Average latency
+- P95 latency
+- Error rate
+- Token usage
+- Requests per model
+
+
 {
   "totalRequests": 120,
   "successCount": 110,
