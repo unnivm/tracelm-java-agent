@@ -26,7 +26,7 @@ TraceLM solves this by:
 - Enabling production-grade observability for AI systems
 
   
-🚀 Overview
+🚀 ## Overview
 
 TraceLens is a lightweight LLM observability system for Java applications built using a Java Agent.
 
