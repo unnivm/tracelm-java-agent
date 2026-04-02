@@ -1,5 +1,10 @@
 # tracelm-java-agent
 
+![Java](https://img.shields.io/badge/Java-22-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-active-success)
+
+
 ![TraceLM Banner](banner.png)
 
 # Tracelm Demo
