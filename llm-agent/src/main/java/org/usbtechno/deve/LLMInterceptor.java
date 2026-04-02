@@ -34,6 +34,9 @@ public class LLMInterceptor {
         // 🔥 Extract response
         String response = extractResponse(result);
 
+        // get token length for the current prompt
+        int tokenLength = estimateTokens(prompt);
+
         logger.info("TRACE");
         logger.info("traceId: " + traceId);
         logger.info("prompt: " + prompt);
@@ -41,9 +44,13 @@ public class LLMInterceptor {
         logger.info("response: " + response);
         logger.info("status: " + status);
         logger.info("model: " + model);
+        logger.info("token length: " + tokenLength);
 
         // 👉 send to collector
-        TraceSender.send(buildJson(traceId, prompt, response, latency, status, model));
+        TraceSender.send(buildJson(traceId,
+                prompt, response,
+                latency, status, model));
+
         logger.info("metrics sent to the tracer service");
 
         return result;
@@ -95,6 +102,9 @@ public class LLMInterceptor {
                                     long latency,
                                     String status,
                                     String model) {
+
+        long tokenLength = estimateTokens(prompt);
+
         return """
     {
       "traceId":"%s",
@@ -103,7 +113,8 @@ public class LLMInterceptor {
       "latency":%d,
       "timestamp":%d,
       "status":"%s",
-      "model":"%s"
+      "model":"%s",
+      "tokenLength":%d
     }
     """.formatted(
                 traceId,
@@ -112,7 +123,8 @@ public class LLMInterceptor {
                 latency,
                 System.currentTimeMillis(),
                 status,
-                model
+                model,
+                tokenLength
         );
     }
 
@@ -145,5 +157,13 @@ public class LLMInterceptor {
         public String role;
         public String content;
 
+    }
+
+    private static int estimateTokens(String text) {
+        if (text == null || text.isEmpty()) return 0;
+
+        String[] words = text.split("\\s+");
+
+        return (int) (words.length * 1.3);
     }
 }

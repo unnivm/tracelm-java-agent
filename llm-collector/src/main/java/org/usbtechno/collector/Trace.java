@@ -16,4 +16,7 @@ public class Trace {
 
     public String status;
 
+    public long tokenLength;
+
+
 }
