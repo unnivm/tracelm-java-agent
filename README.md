@@ -16,6 +16,16 @@ TraceLM – LLM Observability for Java (Agent-Based, Zero Code Changes)
 
 Gain deep visibility into your LLM calls — track latency, errors, and model usage with zero code changes.
 
+## 🤔 Why TraceLM?
+
+LLM applications are hard to debug and monitor.
+
+TraceLM solves this by:
+- Capturing LLM calls without modifying your code
+- Providing real-time latency and usage insights
+- Enabling production-grade observability for AI systems
+
+  
 🚀 Overview
 
 TraceLens is a lightweight LLM observability system for Java applications built using a Java Agent.
