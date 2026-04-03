@@ -7,9 +7,11 @@
 
 ![TraceLM Banner](banner.png)
 
+![TraceLM Dashboard](demo.gif)
+
 # Tracelm Demo
 
-![TraceLM Demo](demo.gif)
+![TraceLM Demo](Screenshot 2026-04-03 at 10.54.50 PM.png)
 
 
 TraceLM – LLM Observability for Java (Agent-Based, Zero Code Changes)
