@@ -7,6 +7,8 @@
 
 ![TraceLM Banner](banner.png)
 
+![TraceLM Dashboard](demo.gif)
+
 # Tracelm Demo
 
 ![TraceLM Demo](demo.gif)
