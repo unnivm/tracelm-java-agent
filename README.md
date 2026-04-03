@@ -1,12 +1,32 @@
 # tracelm-java-agent
 
+![Java](https://img.shields.io/badge/Java-22-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-active-success)
+
+
 ![TraceLM Banner](banner.png)
+
+# Tracelm Demo
+
+![TraceLM Demo](demo.gif)
+
 
 TraceLM – LLM Observability for Java (Agent-Based, Zero Code Changes)
 
 Gain deep visibility into your LLM calls — track latency, errors, and model usage with zero code changes.
 
-🚀 Overview
+## 🤔 Why TraceLM?
+
+LLM applications are hard to debug and monitor.
+
+TraceLM solves this by:
+- Capturing LLM calls without modifying your code
+- Providing real-time latency and usage insights
+- Enabling production-grade observability for AI systems
+
+  
+## 🚀  Overview
 
 TraceLens is a lightweight LLM observability system for Java applications built using a Java Agent.
 
@@ -120,6 +140,16 @@ GET /traces
 
 
 📊 Sample Metrics Response
+
+## 📊 Metrics You Get
+
+- Total requests
+- Average latency
+- P95 latency
+- Error rate
+- Token usage
+- Requests per model
+
 
 {
   "totalRequests": 120,
