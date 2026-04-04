@@ -9,6 +9,8 @@
 
 ![TraceLM Dashboard](gui.png)
 
+![TraceLM Dashboard](gui-1.png)
+
 
 # Tracelm Demo
 
