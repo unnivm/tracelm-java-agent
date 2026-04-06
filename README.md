@@ -123,23 +123,23 @@ mvn clean install
 
 2️⃣ Start Collector
 
-cd llm-collector
+```cd llm-collector```
 
-mvn quarkus:dev
+```mvn quarkus:dev```
 
 Collector runs at:
 
-http://localhost:8080
+```http://localhost:8080```
 
 3️⃣ Run Application with Agent
 
-java -javaagent:llm-agent/target/llm-agent.jar -jar demo-app/target/demo-app.jar
+```java -javaagent:llm-agent/target/llm-agent.jar -jar demo-app/target/demo-app.jar```
 
 📡 API Endpoints
 
 🔹 Get All Traces
 
-GET /traces
+```GET /traces```
 
 📡 API Endpoints
 
@@ -155,7 +155,7 @@ GET /traces
 - Token usage
 - Requests per model
 
-
+```
 {
   "totalRequests": 120,
   "successCount": 110,
@@ -163,10 +163,10 @@ GET /traces
   "avgLatency": 45.3,
   "p95Latency": 120
 }
-
+```
 
 🧠 Trace Schema
-
+```
 {
   "traceId": "string",
   "timestamp": 123456789,
@@ -177,7 +177,7 @@ GET /traces
   "status": "success",
   "error": null
 }
-
+```
 🔒 Design Principles
 
 🚫 No application code changes
