@@ -123,23 +123,33 @@ mvn clean install
 
 2️⃣ Start Collector
 
-```cd llm-collector```
+```
+cd llm-collector
+```
 
-```mvn quarkus:dev```
+```
+mvn quarkus:dev
+```
 
 Collector runs at:
 
-```http://localhost:8080```
+```
+http://localhost:8080
+```
 
 3️⃣ Run Application with Agent
 
-```java -javaagent:llm-agent/target/llm-agent.jar -jar demo-app/target/demo-app.jar```
+```
+java -javaagent:llm-agent/target/llm-agent.jar -jar demo-app/target/demo-app.jar
+```
 
 📡 API Endpoints
 
 🔹 Get All Traces
 
-```GET /traces```
+```
+GET /traces
+```
 
 📡 API Endpoints
 
