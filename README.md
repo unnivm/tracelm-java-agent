@@ -117,8 +117,9 @@ Collector stores and exposes metrics
 ▶️ Getting Started
 
 1️⃣ Build the Project
-
+```
 mvn clean install
+```
 
 2️⃣ Start Collector
 
