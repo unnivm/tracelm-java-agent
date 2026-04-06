@@ -81,14 +81,14 @@ Sample app using LangChain4J
 
 ❌ Error tracking
 
-📊 Metrics API (total requests, avg latency, p95 latency)
+## 📊 Metrics API (total requests, avg latency, p95 latency)
 
 🧵 Thread-safe collector
 
 🚀 Lightweight and extensible
 
 
-📦 Project Structure
+## 📦 Project Structure
 
 trace-lens/
  ├── llm-agent/
@@ -96,7 +96,7 @@ trace-lens/
  ├── demo-app/
  ├── README.md
 
-⚙️ How It Works
+## ⚙️ How It Works
 
 Java Agent intercepts LLM calls
 
@@ -144,7 +144,7 @@ http://localhost:8080
 java -javaagent:llm-agent/target/llm-agent.jar -jar demo-app/target/demo-app.jar
 ```
 
-📡 API Endpoints
+## 📡 API Endpoints
 
 🔹 Get All Traces
 
