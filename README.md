@@ -32,7 +32,7 @@ TraceLM solves this by:
   
 ## 🚀  Overview
 
-TraceLens is a lightweight LLM observability system for Java applications built using a Java Agent.
+TraceLM is a lightweight LLM observability system for Java applications built using a Java Agent.
 
 It enables you to monitor and analyze LLM interactions without modifying your application code.
 
