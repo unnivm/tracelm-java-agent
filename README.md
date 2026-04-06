@@ -101,7 +101,7 @@ trace-lens/
 Java Agent intercepts LLM calls
 
 Extracts:
-
+```
 traceId
 
 latency
@@ -109,6 +109,7 @@ latency
 model
 
 status
+```
 
 Sends data to collector via HTTP
 
