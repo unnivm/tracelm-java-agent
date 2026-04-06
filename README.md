@@ -45,7 +45,7 @@ TraceLens captures:
 
 All data is sent to a collector service for aggregation and analysis.
 
-🏗️ Architecture
+## 🏗️ Architecture
 
 Application → Java Agent → HTTP → Collector → Metrics API
 
