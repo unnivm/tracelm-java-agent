@@ -8,7 +8,7 @@
 ![TraceLM Banner](banner.png)
 
 
-![TraceLM Dashboard](gui-1.png)
+![TraceLM Dashboard](gui-2.png)
 
 
 # Tracelm Demo
