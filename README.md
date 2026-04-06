@@ -128,7 +128,7 @@ cd llm-collector
 ```
 
 ```
-mvn quarkus:dev
+mvn quarkus:dev OR Run Main.java
 ```
 
 Collector runs at:
