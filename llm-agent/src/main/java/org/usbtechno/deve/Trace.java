@@ -1,4 +1,4 @@
-package org.usbtechno.collector;
+package org.usbtechno.deve;
 
 public class Trace {
 
@@ -22,6 +22,5 @@ public class Trace {
     public int responseTokens;
     public int totalTokens;
     public double cost;
-
 
 }

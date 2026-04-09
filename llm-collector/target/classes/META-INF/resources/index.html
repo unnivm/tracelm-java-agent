@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TraceLM Dashboard</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        canvas {
+            height: 260px !important;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-950 text-slate-200">
+
+<div class="flex h-screen">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 p-6 hidden md:block">
+        <h1 class="text-xl font-bold text-blue-400 mb-8">🚀 TraceLM</h1>
+
+        <nav class="space-y-4 text-sm">
+            <div id="nav-dashboard" onclick="showSection('dashboard')" class="text-white cursor-pointer">
+                📊 Dashboard
+            </div>
+            <div id="nav-metrics" onclick="showSection('metrics')" class="text-slate-400 hover:text-white cursor-pointer">
+                📈 Metrics
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 p-6 overflow-y-auto">
+
+        <!-- ================= DASHBOARD ================= -->
+        <div id="dashboardSection">
+
+            <h2 class="text-2xl font-semibold mb-4">Dashboard</h2>
+
+            <!-- KPI -->
+            <div id="metrics" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6"></div>
+
+            <!-- Charts -->
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 h-[300px]">
+                    <h3 class="text-sm text-slate-400 mb-2">Model Usage</h3>
+                    <canvas id="modelChart"></canvas>
+                </div>
+
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 h-[300px]">
+                    <h3 class="text-sm text-slate-400 mb-2">Latency Distribution</h3>
+                    <canvas id="latencyChart"></canvas>
+                </div>
+
+            </div>
+
+            <!-- Time -->
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 mb-6 h-[300px]">
+                <h3 class="text-sm text-slate-400 mb-2">Requests Over Time</h3>
+                <canvas id="timeChart"></canvas>
+            </div>
+
+            <!-- Recent Requests -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <div class="p-4 border-b border-slate-800">
+                    <h3 class="text-sm text-slate-400">Recent Requests</h3>
+                </div>
+
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-800 text-slate-400">
+                    <tr>
+                        <th class="p-3 text-left">TraceId</th>
+                        <th class="p-3 text-left">Model</th>
+                        <th class="p-3 text-left">Latency</th>
+                        <th class="p-3 text-left">Status</th>
+                        <th class="p-3 text-left">Tokens</th>
+                    </tr>
+                    </thead>
+                    <tbody id="traceTable"></tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <!-- ================= METRICS PAGE ================= -->
+        <div id="metricsSection" class="hidden">
+
+            <h2 class="text-2xl font-semibold mb-6">📈 Metrics Insights</h2>
+
+            <!-- Summary -->
+            <div id="metricsDetails" class="grid md:grid-cols-3 gap-4 mb-6"></div>
+
+            <!-- Request Insights -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 mb-6">
+                <h3 class="text-lg mb-3">📊 Request Insights</h3>
+                <div id="requestInsights" class="text-slate-400 text-sm"></div>
+            </div>
+
+        </div>
+
+    </main>
+</div>
+
+<script>
+
+    function showSection(section) {
+        document.getElementById('dashboardSection').classList.add('hidden');
+        document.getElementById('metricsSection').classList.add('hidden');
+
+        document.getElementById('nav-dashboard').classList.remove('text-white');
+        document.getElementById('nav-metrics').classList.remove('text-white');
+
+        if (section === 'dashboard') {
+            document.getElementById('dashboardSection').classList.remove('hidden');
+            document.getElementById('nav-dashboard').classList.add('text-white');
+        }
+
+        if (section === 'metrics') {
+            document.getElementById('metricsSection').classList.remove('hidden');
+            document.getElementById('nav-metrics').classList.add('text-white');
+        }
+    }
+
+    async function loadMetrics() {
+        const data = await (await fetch('/traces/metrics')).json();
+
+        // KPI Cards
+        document.getElementById('metrics').innerHTML = `
+            <div class="card">Requests<br>${data.totalRequests}</div>
+            <div class="card">Avg Latency<br>${data.avgLatency.toFixed(2)} ms</div>
+            <div class="card">P95<br>${data.p95} ms</div>
+            <div class="card">Error Rate<br>${data.errorRate}%</div>
+            <div class="card">Tokens<br>${data.totalTokens}</div>
+        `;
+
+        // Metrics page details
+        document.getElementById('metricsDetails').innerHTML = `
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <div>Total Requests</div>
+                <div class="text-xl font-bold">${data.totalRequests}</div>
+            </div>
+
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <div>Avg Latency</div>
+                <div class="text-xl font-bold">${data.avgLatency.toFixed(2)} ms</div>
+            </div>
+
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <div>P95</div>
+                <div class="text-xl font-bold">${data.p95} ms</div>
+            </div>
+        `;
+    }
+
+    async function loadTraces() {
+        const traces = await (await fetch('/traces')).json();
+
+        // Table
+        document.getElementById('traceTable').innerHTML =
+            traces.slice(-10).reverse().map(t => `
+                <tr class="hover:bg-slate-800">
+                    <td class="p-3">${t.traceId.substring(0,8)}</td>
+                    <td class="p-3">${t.model}</td>
+                    <td class="p-3">${t.latency}</td>
+                    <td class="p-3 ${t.status==='error'?'text-red-400':'text-green-400'}">${t.status}</td>
+                    <td class="p-3">${t.tokenLength}</td>
+                </tr>
+            `).join('');
+
+        // Insights
+        const avg = traces.reduce((a,b)=>a+b.latency,0)/traces.length || 0;
+
+        document.getElementById('requestInsights').innerHTML = `
+            Total Requests: ${traces.length} <br>
+            Average Latency: ${avg.toFixed(2)} ms <br>
+            Slow Requests (>500ms): ${traces.filter(t=>t.latency>500).length}
+        `;
+    }
+
+    let modelChart, latencyChart, timeChart;
+
+    async function loadModelChart() {
+        const data = await (await fetch('/traces/model-metrics')).json();
+        const ctx = document.getElementById('modelChart').getContext('2d');
+
+        if (modelChart) modelChart.destroy();
+
+        modelChart = new Chart(ctx, {
+            type:'bar',
+            data:{ labels:Object.keys(data), datasets:[{label:'Requests per Model',data:Object.values(data), backgroundColor:'#38bdf8', barThickness: 40,           // ✅ fixed width
+            maxBarThickness: 50}] },
+            options:{ maintainAspectRatio:false, scales: {
+            x: {
+                offset: true           // ✅ centers single bar nicely
+            },
+            y: {
+                beginAtZero: true
+            }
+        } }
+        });
+    }
+
+    async function loadLatencyChart() {
+        const traces = await (await fetch('/traces')).json();
+
+        let f=0,m=0,s=0;
+        traces.forEach(t=>t.latency<100?f++:t.latency<500?m++:s++);
+
+        const ctx = document.getElementById('latencyChart').getContext('2d');
+
+        if (latencyChart) latencyChart.destroy();
+
+        latencyChart = new Chart(ctx,{
+            type:'pie',
+            data:{ labels:['Fast','Medium','Slow'], datasets:[{data:[f,m,s]}] },
+            options:{ maintainAspectRatio:false }
+        });
+    }
+
+    async function loadTimeSeriesChart() {
+        const data = await (await fetch('/traces/time-series')).json();
+        const ctx = document.getElementById('timeChart').getContext('2d');
+
+        if (timeChart) timeChart.destroy();
+
+        timeChart = new Chart(ctx,{
+            type:'line',
+            data:{ labels:Object.keys(data), datasets:[{label: 'Requests Over Time', data:Object.values(data), borderColor:'#38bdf8'}] },
+            options:{ maintainAspectRatio:false }
+        });
+    }
+
+    function refresh() {
+        loadMetrics();
+        loadTraces();
+        loadModelChart();
+        loadLatencyChart();
+        loadTimeSeriesChart();
+    }
+
+    refresh();
+    setInterval(refresh,5000);
+
+</script>
+
+</body>
+</html>

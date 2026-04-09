@@ -6,6 +6,9 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
@@ -37,6 +40,10 @@ public class TraceResource {
         logger.info("model: "    + trace.model);
         logger.info("total requests: "    + traces.size());
         logger.info("token length:" + trace.tokenLength);
+        logger.info("response token:" + trace.responseTokens);
+        logger.info("prompt token:" + trace.promptTokens);
+        logger.info("cost :" + trace.cost);
+
 
         return Response.ok().build();
     }
@@ -64,9 +71,11 @@ public class TraceResource {
                 .sorted()
                 .toList();
 
-        int index = (int) (0.95 * latencies.size());
-        long p95 = latencies.get(index);
-        metrics.put("p95", p95);
+        if(latencies != null && latencies.size()>0) {
+            int index = (int) (0.95 * latencies.size());
+            long p95 = latencies.get(index);
+            metrics.put("p95", p95);
+        }
 
         long errorCount = traces.stream()
                 .filter(t -> "error".equals(t.status))
@@ -94,4 +103,40 @@ public class TraceResource {
 
         return metrics;
     }
+
+    @GET
+    @Path("/model-metrics")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, Long> modelMetrics() {
+        return traces.stream()
+                .collect(Collectors.groupingBy(
+                        t -> t.model,
+                        Collectors.counting()
+                ));
+    }
+
+    @GET
+    @Path("")
+    public List<Trace> getTraces() {
+        return traces;
+    }
+
+    @GET
+    @Path("/time-series")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, Long> timeSeries() {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        return traces.stream()
+                .collect(Collectors.groupingBy(
+                        t -> Instant.ofEpochMilli(t.timestamp)
+                                .atZone(ZoneId.systemDefault())
+                                .format(formatter),
+                        TreeMap::new,
+                        Collectors.counting()
+                ));
+    }
+
+
 }

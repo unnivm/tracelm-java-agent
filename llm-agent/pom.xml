@@ -31,6 +31,12 @@
             <version>1.14.12</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.knuddels</groupId>
+            <artifactId>jtokkit</artifactId>
+            <version>0.6.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
