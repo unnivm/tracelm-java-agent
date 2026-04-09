@@ -132,13 +132,13 @@ cd llm-collector
 mvn quarkus:dev OR Run Main.java
 ```
 
-# Collector runs at:
+### Collector runs at:
 
 ```
 http://localhost:8080
 ```
 
-# 3️⃣ Run Application with Agent
+### 3️⃣ Run Application with Agent
 
 ```
 java -javaagent:llm-agent/target/llm-agent.jar -jar demo-app/target/demo-app.jar
