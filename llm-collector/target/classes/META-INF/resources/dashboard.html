@@ -17,6 +17,8 @@
         .metric-tooltip { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%) translateY(6px); background: #0f172a; color: #e2e8f0; padding: 10px 12px; border-radius: 10px; border: 1px solid #334155; width: 220px; text-align: left; font-size: 12px; line-height: 1.4; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.45); opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; z-index: 30; }
         .metric-tooltip::after { content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 6px; border-style: solid; border-color: #0f172a transparent transparent transparent; }
         .metric-info:hover .metric-tooltip, .metric-info:focus .metric-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .section-title { color: #f8fafc; font-size: 1rem; font-weight: 600; }
+        .section-copy { color: #94a3b8; font-size: 0.85rem; line-height: 1.55; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-200">
@@ -42,48 +44,140 @@
         <div class="flex items-start justify-between gap-4 mb-6">
             <div>
                 <h2 class="text-2xl font-semibold">Dashboard</h2>
-                <p class="text-slate-400 text-sm mt-1">Track request health, model usage, and spend in one place.</p>
+                <p class="text-slate-400 text-sm mt-1">Track request health, model usage, spend, and response quality in one operational workspace.</p>
             </div>
             <a href="/" class="text-sm text-sky-300 hover:text-sky-200">View landing page</a>
         </div>
 
         <div id="dashboardSection">
+            <div class="grid xl:grid-cols-3 gap-6 mb-6">
+                <div class="xl:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
+                    <div class="section-title">Operational Overview</div>
+                    <p class="section-copy mt-2">
+                        This dashboard is designed to help your team move from raw trace collection to confident operational decisions.
+                        Use the KPI row for fast health checks, the charts for trend analysis, and the request panels below to investigate
+                        expensive prompts, latency outliers, and response-quality drift.
+                    </p>
+                    <div class="grid md:grid-cols-3 gap-4 mt-5">
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div class="text-slate-500 text-xs uppercase tracking-wide">Observe</div>
+                            <div class="mt-2 text-white font-semibold">What is happening right now?</div>
+                            <p class="mt-2 text-sm text-slate-400">Use requests, latency, error rate, and quality score to understand current system health.</p>
+                        </div>
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div class="text-slate-500 text-xs uppercase tracking-wide">Diagnose</div>
+                            <div class="mt-2 text-white font-semibold">What is causing issues?</div>
+                            <p class="mt-2 text-sm text-slate-400">Inspect slow requests, costly prompts, and model-specific behavior to isolate the source.</p>
+                        </div>
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div class="text-slate-500 text-xs uppercase tracking-wide">Decide</div>
+                            <div class="mt-2 text-white font-semibold">What should we change next?</div>
+                            <p class="mt-2 text-sm text-slate-400">Compare speed, spend, and quality together before tuning prompts or switching models.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
+                    <div class="section-title">How To Read This</div>
+                    <div class="mt-4 space-y-4 text-sm">
+                        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div class="text-white font-medium">KPI cards</div>
+                            <p class="mt-1 text-slate-400">Your fastest summary of traffic, cost, latency, quality, and failure rate.</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div class="text-white font-medium">Charts</div>
+                            <p class="mt-1 text-slate-400">Useful for spotting trend shifts, concentration by model, and traffic shape over time.</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div class="text-white font-medium">Request panels</div>
+                            <p class="mt-1 text-slate-400">Best for drilling into concrete examples when you need to explain a spike or regression.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="metrics" class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6"></div>
             <div class="grid md:grid-cols-2 gap-6 mb-6">
                 <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 h-[300px]">
-                    <h3 class="text-sm text-slate-400 mb-2">Model Usage</h3>
+                    <h3 class="section-title">Model Usage</h3>
+                    <p class="section-copy mt-1 mb-3">Shows where request volume is concentrated so you can identify dominant models and traffic skew.</p>
                     <canvas id="modelChart"></canvas>
                 </div>
                 <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 h-[300px]">
-                    <h3 class="text-sm text-slate-400 mb-2">Latency Distribution</h3>
+                    <h3 class="section-title">Latency Distribution</h3>
+                    <p class="section-copy mt-1 mb-3">Breaks traffic into fast, medium, and slow buckets to surface user-experience risk quickly.</p>
                     <canvas id="latencyChart"></canvas>
                 </div>
             </div>
             <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 mb-6 h-[300px]">
-                <h3 class="text-sm text-slate-400 mb-2">Requests Over Time</h3>
+                <h3 class="section-title">Requests Over Time</h3>
+                <p class="section-copy mt-1 mb-3">Use this trend line to understand load changes, rollout impact, and traffic surges over time.</p>
                 <canvas id="timeChart"></canvas>
             </div>
             <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 mb-6 h-[300px]">
-                <h3 class="text-sm text-slate-400 mb-2">Tokens & Cost</h3>
+                <h3 class="section-title">Tokens & Cost</h3>
+                <p class="section-copy mt-1 mb-3">Compares model token usage and estimated spend so you can spot inefficient patterns before they grow.</p>
                 <canvas id="tokenChart"></canvas>
             </div>
             <div class="grid md:grid-cols-2 gap-6 mb-6">
                 <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
                     <div class="p-4 border-b border-slate-800">
-                        <h3 class="text-sm text-slate-400">Costly Prompts</h3>
+                        <h3 class="section-title">Costly Prompts</h3>
+                        <p class="section-copy mt-1">Highlights prompts with the highest per-request cost so you can review prompt size and model choice.</p>
                     </div>
                     <div id="costlyPrompts" class="divide-y divide-slate-800"></div>
                 </div>
                 <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
                     <div class="p-4 border-b border-slate-800">
-                        <h3 class="text-sm text-slate-400">Slow Requests</h3>
+                        <h3 class="section-title">Slow Requests</h3>
+                        <p class="section-copy mt-1">Surfaces the worst latency outliers so your team can investigate degraded user experience immediately.</p>
                     </div>
                     <div id="slowRequests" class="divide-y divide-slate-800"></div>
                 </div>
             </div>
+            <div class="grid lg:grid-cols-3 gap-6 mb-6">
+                <div class="lg:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
+                    <div class="section-title">What This Dashboard Helps You Answer</div>
+                    <div class="grid md:grid-cols-2 gap-4 mt-4">
+                        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div class="text-white font-medium">Why did response quality change?</div>
+                            <p class="mt-2 text-sm text-slate-400">Compare quality badges, recent traces, and expensive or slow requests to see what shifted.</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div class="text-white font-medium">Which model is driving spend?</div>
+                            <p class="mt-2 text-sm text-slate-400">Use model usage, token trends, and costly prompts together to spot cost concentration.</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div class="text-white font-medium">Are users waiting too long?</div>
+                            <p class="mt-2 text-sm text-slate-400">Check P95, latency distribution, and the slow requests panel for tail latency problems.</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div class="text-white font-medium">Is the rollout healthy?</div>
+                            <p class="mt-2 text-sm text-slate-400">Watch requests over time, error rate, and quality score to catch regressions early.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
+                    <div class="section-title">Operator Notes</div>
+                    <div class="mt-4 space-y-4">
+                        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div class="text-white font-medium text-sm">Quality score</div>
+                            <p class="mt-1 text-sm text-slate-400">A heuristic signal that helps flag weak or strong responses. Use it directionally, not as a final judgment.</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div class="text-white font-medium text-sm">Cost data</div>
+                            <p class="mt-1 text-sm text-slate-400">Cost is estimated from captured request metadata, so it is best used for trend comparison and outlier detection.</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+                            <div class="text-white font-medium text-sm">Live updates</div>
+                            <p class="mt-1 text-sm text-slate-400">The dashboard refreshes automatically, making it suitable for active monitoring during releases or incidents.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
                 <div class="p-4 border-b border-slate-800">
-                    <h3 class="text-sm text-slate-400">Recent Requests</h3>
+                    <h3 class="section-title">Recent Requests</h3>
+                    <p class="section-copy mt-1">The latest captured traces with latency, quality, status, token usage, and cost for quick request-level inspection.</p>
                 </div>
                 <table class="w-full text-sm">
                     <thead class="bg-slate-800 text-slate-400">
@@ -210,6 +304,21 @@
                 <div class="text-slate-400 text-sm mb-2">Success Rate</div>
                 <div class="text-xl font-semibold text-white">${successRate.toFixed(1)}%</div>
                 <div class="text-sm text-slate-400 mt-2">${formatNumber(successCount)} successful requests</div>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                <div class="text-slate-400 text-sm mb-2">Avg Quality</div>
+                <div class="text-xl font-semibold text-white">${getScoreBadge(metrics.avgQualityScore)}</div>
+                <div class="text-sm text-slate-400 mt-2">Heuristic signal across captured responses</div>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                <div class="text-slate-400 text-sm mb-2">Traffic Volume</div>
+                <div class="text-xl font-semibold text-white">${formatNumber(metrics.totalRequests)}</div>
+                <div class="text-sm text-slate-400 mt-2">Requests currently stored for analysis</div>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                <div class="text-slate-400 text-sm mb-2">P95 Latency</div>
+                <div class="text-xl font-semibold text-white">${metrics.p95 ?? 0} ms</div>
+                <div class="text-sm text-slate-400 mt-2">Tail performance threshold for most requests</div>
             </div>
         `;
 
