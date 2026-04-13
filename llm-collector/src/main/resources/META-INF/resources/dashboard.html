@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraceLM Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        canvas { height: 260px !important; }
+        .card { background: #1e293b; padding: 16px; border-radius: 12px; text-align: center; transition: 0.2s; position: relative; overflow: visible; }
+        .card:hover { transform: scale(1.05); }
+        .metric-label { display: flex; align-items: center; justify-content: center; gap: 8px; color: #cbd5e1; font-size: 0.9rem; }
+        .metric-value { margin-top: 10px; font-size: 1.1rem; font-weight: 600; color: #f8fafc; }
+        .metric-value.text-green-400 { color: #4ade80; }
+        .metric-info { width: 18px; height: 18px; border-radius: 9999px; border: 1px solid #475569; color: #94a3b8; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; cursor: help; position: relative; flex-shrink: 0; }
+        .metric-tooltip { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%) translateY(6px); background: #0f172a; color: #e2e8f0; padding: 10px 12px; border-radius: 10px; border: 1px solid #334155; width: 220px; text-align: left; font-size: 12px; line-height: 1.4; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.45); opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; z-index: 30; }
+        .metric-tooltip::after { content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 6px; border-style: solid; border-color: #0f172a transparent transparent transparent; }
+        .metric-info:hover .metric-tooltip, .metric-info:focus .metric-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200">
+<div class="flex h-screen">
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 p-6 hidden md:block">
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-xl font-bold text-blue-400">TraceLM</h1>
+            <span class="text-xs text-slate-400">Live</span>
+        </div>
+        <div class="mb-8 rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Signed in as</p>
+            <p id="userName" class="mt-2 text-sm font-medium text-white">Loading...</p>
+            <p id="userEmail" class="mt-1 text-xs text-slate-400"></p>
+        </div>
+        <nav class="space-y-4 text-sm">
+            <div id="nav-dashboard" onclick="showSection('dashboard')" class="text-white cursor-pointer">📊 Dashboard</div>
+            <div id="nav-metrics" onclick="showSection('metrics')" class="text-slate-400 hover:text-white cursor-pointer">📈 Metrics</div>
+        </nav>
+        <button id="logoutButton" class="mt-8 w-full rounded-2xl border border-slate-700 px-4 py-3 text-sm hover:border-rose-400 hover:text-rose-300 transition">Logout</button>
+    </aside>
+
+    <main class="flex-1 p-6 overflow-y-auto">
+        <div class="flex items-start justify-between gap-4 mb-6">
+            <div>
+                <h2 class="text-2xl font-semibold">Dashboard</h2>
+                <p class="text-slate-400 text-sm mt-1">Track request health, model usage, and spend in one place.</p>
+            </div>
+            <a href="/" class="text-sm text-sky-300 hover:text-sky-200">View landing page</a>
+        </div>
+
+        <div id="dashboardSection">
+            <div id="metrics" class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6"></div>
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 h-[300px]">
+                    <h3 class="text-sm text-slate-400 mb-2">Model Usage</h3>
+                    <canvas id="modelChart"></canvas>
+                </div>
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 h-[300px]">
+                    <h3 class="text-sm text-slate-400 mb-2">Latency Distribution</h3>
+                    <canvas id="latencyChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 mb-6 h-[300px]">
+                <h3 class="text-sm text-slate-400 mb-2">Requests Over Time</h3>
+                <canvas id="timeChart"></canvas>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 mb-6 h-[300px]">
+                <h3 class="text-sm text-slate-400 mb-2">Tokens & Cost</h3>
+                <canvas id="tokenChart"></canvas>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                    <div class="p-4 border-b border-slate-800">
+                        <h3 class="text-sm text-slate-400">Costly Prompts</h3>
+                    </div>
+                    <div id="costlyPrompts" class="divide-y divide-slate-800"></div>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                    <div class="p-4 border-b border-slate-800">
+                        <h3 class="text-sm text-slate-400">Slow Requests</h3>
+                    </div>
+                    <div id="slowRequests" class="divide-y divide-slate-800"></div>
+                </div>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                <div class="p-4 border-b border-slate-800">
+                    <h3 class="text-sm text-slate-400">Recent Requests</h3>
+                </div>
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-800 text-slate-400">
+                    <tr>
+                        <th class="p-3 text-left">TraceId</th>
+                        <th class="p-3 text-left">Model</th>
+                        <th class="p-3 text-left">Latency</th>
+                        <th class="p-3 text-left">Quality</th>
+                        <th class="p-3 text-left">Status</th>
+                        <th class="p-3 text-left">Tokens</th>
+                        <th class="p-3 text-left">Cost</th>
+                    </tr>
+                    </thead>
+                    <tbody id="traceTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="metricsSection" class="hidden">
+            <h2 class="text-2xl font-semibold mb-6">📈 Metrics Insights</h2>
+            <div id="metricsDetails" class="grid md:grid-cols-3 gap-4 mb-6"></div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                <h3 class="text-lg mb-3">📊 Request Insights</h3>
+                <div id="requestInsights" class="text-slate-400 text-sm"></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    async function ensureAuthenticated() {
+        const response = await fetch('/auth/me');
+        if (!response.ok) {
+            window.location.href = '/login.html';
+            throw new Error('Not authenticated');
+        }
+        const user = await response.json();
+        document.getElementById('userName').textContent = user.name;
+        document.getElementById('userEmail').textContent = user.email;
+        return user;
+    }
+
+    function showSection(section) {
+        document.getElementById('dashboardSection').classList.add('hidden');
+        document.getElementById('metricsSection').classList.add('hidden');
+        document.getElementById('nav-dashboard').classList.remove('text-white');
+        document.getElementById('nav-metrics').classList.remove('text-white');
+
+        if (section === 'dashboard') {
+            document.getElementById('dashboardSection').classList.remove('hidden');
+            document.getElementById('nav-dashboard').classList.add('text-white');
+        }
+
+        if (section === 'metrics') {
+            document.getElementById('metricsSection').classList.remove('hidden');
+            document.getElementById('nav-metrics').classList.add('text-white');
+            loadTraces();
+            loadMetrics();
+        }
+    }
+
+    function formatNumber(value) {
+        return Number(value || 0).toLocaleString();
+    }
+
+    function createMetricCard(label, value, tooltip, cardClass = '', valueClass = '') {
+        return `
+            <div class="card ${cardClass}">
+                <div class="metric-label">
+                    <span>${label}</span>
+                    <span class="metric-info" tabindex="0" aria-label="${label} information">
+                        i
+                        <span class="metric-tooltip">${tooltip}</span>
+                    </span>
+                </div>
+                <div class="metric-value ${valueClass}">${value}</div>
+            </div>
+        `;
+    }
+
+    function getScoreBadge(score) {
+        if (score === null || score === undefined || score === '') return '-';
+        const numericScore = Number(score);
+        if (Number.isNaN(numericScore)) return '-';
+
+        if (numericScore > 0.8) {
+            return `<span class="text-green-400">🟢 ${numericScore.toFixed(2)}</span>`;
+        }
+
+        if (numericScore > 0.5) {
+            return `<span class="text-yellow-400">🟡 ${numericScore.toFixed(2)}</span>`;
+        }
+
+        return `<span class="text-red-400">🔴 ${numericScore.toFixed(2)}</span>`;
+    }
+
+    function renderMetricsInsights(metrics, traces) {
+        const requestsPerModel = metrics.requestsPerModel || {};
+        const modelEntries = Object.entries(requestsPerModel).sort((a, b) => b[1] - a[1]);
+        const topModel = modelEntries[0];
+        const totalLatency = traces.reduce((sum, trace) => sum + (trace.latency || 0), 0);
+        const totalPromptTokens = traces.reduce((sum, trace) => sum + (trace.promptTokens || 0), 0);
+        const totalResponseTokens = traces.reduce((sum, trace) => sum + (trace.responseTokens || 0), 0);
+        const successCount = traces.filter(t => (t.status || '').toLowerCase() !== 'error').length;
+        const latestTrace = [...traces].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))[0];
+        const avgPromptTokens = traces.length ? Math.round(totalPromptTokens / traces.length) : 0;
+        const avgResponseTokens = traces.length ? Math.round(totalResponseTokens / traces.length) : 0;
+        const avgCostPerRequest = traces.length ? (metrics.totalCost || 0) / traces.length : 0;
+        const successRate = metrics.totalRequests ? ((successCount * 100) / metrics.totalRequests) : 0;
+        const avgLatencyPerToken = metrics.totalTokens ? (totalLatency / metrics.totalTokens) : 0;
+
+        document.getElementById('metricsDetails').innerHTML = `
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                <div class="text-slate-400 text-sm mb-2">Top Model</div>
+                <div class="text-xl font-semibold text-white">${topModel ? topModel[0] : 'No traffic yet'}</div>
+                <div class="text-sm text-slate-400 mt-2">${topModel ? `${formatNumber(topModel[1])} requests` : 'Waiting for requests'}</div>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                <div class="text-slate-400 text-sm mb-2">Avg Cost / Request</div>
+                <div class="text-xl font-semibold text-green-400">$${avgCostPerRequest.toFixed(5)}</div>
+                <div class="text-sm text-slate-400 mt-2">${formatNumber(metrics.totalRequests)} total requests</div>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                <div class="text-slate-400 text-sm mb-2">Success Rate</div>
+                <div class="text-xl font-semibold text-white">${successRate.toFixed(1)}%</div>
+                <div class="text-sm text-slate-400 mt-2">${formatNumber(successCount)} successful requests</div>
+            </div>
+        `;
+
+        document.getElementById('requestInsights').innerHTML = `
+            <div class="grid gap-3 md:grid-cols-2">
+                <div class="bg-slate-800/70 rounded-lg p-4">
+                    <div class="text-slate-500 uppercase tracking-wide text-xs mb-1">Traffic Pattern</div>
+                    <div class="text-slate-200">${topModel ? `<span class="text-white font-medium">${topModel[0]}</span> handles ${((topModel[1] * 100) / Math.max(metrics.totalRequests || 1, 1)).toFixed(1)}% of observed traffic.` : 'No model traffic has been captured yet.'}</div>
+                </div>
+                <div class="bg-slate-800/70 rounded-lg p-4">
+                    <div class="text-slate-500 uppercase tracking-wide text-xs mb-1">Token Mix</div>
+                    <div class="text-slate-200">Avg prompt tokens: <span class="text-white font-medium">${formatNumber(avgPromptTokens)}</span><br>Avg response tokens: <span class="text-white font-medium">${formatNumber(avgResponseTokens)}</span></div>
+                </div>
+                <div class="bg-slate-800/70 rounded-lg p-4">
+                    <div class="text-slate-500 uppercase tracking-wide text-xs mb-1">Latency Efficiency</div>
+                    <div class="text-slate-200">${metrics.avgLatency?.toFixed(2) || '0.00'} ms avg latency with <span class="text-white font-medium">${avgLatencyPerToken.toFixed(4)} ms/token</span>.</div>
+                </div>
+                <div class="bg-slate-800/70 rounded-lg p-4">
+                    <div class="text-slate-500 uppercase tracking-wide text-xs mb-1">Latest Request</div>
+                    <div class="text-slate-200">${latestTrace ? `<span class="text-white font-medium">${latestTrace.model}</span> returned ${latestTrace.status} in ${latestTrace.latency} ms.` : 'No recent request available.'}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    async function loadMetrics() {
+        const [metrics, traces] = await Promise.all([
+            (await fetch('/traces/metrics')).json(),
+            (await fetch('/traces?limit=200')).json()
+        ]);
+
+        document.getElementById('metrics').innerHTML = `
+            ${createMetricCard('Requests', formatNumber(metrics.totalRequests), 'Total number of requests captured by the collector across all models.')}
+            ${createMetricCard('Avg Latency', `${metrics.avgLatency.toFixed(2)} ms`, 'Average time taken for a request to complete, measured from request start to response.')}
+            ${createMetricCard('P95', `${metrics.p95 ?? 0} ms`, '95% of requests finished at or below this latency. It helps highlight slow-tail performance.')}
+            ${createMetricCard('Error Rate', `${metrics.errorRate.toFixed(2)}%`, 'Percentage of requests marked with an error status out of the total requests received.')}
+            ${createMetricCard('Quality', getScoreBadge(metrics.avgQualityScore), 'Average heuristic quality score for collected LLM responses.', '', '')}
+            ${createMetricCard('Tokens', formatNumber(metrics.totalTokens), 'Combined token usage across all collected requests, including prompt and response tokens.')}
+            ${createMetricCard('Cost', `$${metrics.totalCost?.toFixed(4) || 0}`, 'Estimated cumulative spend across all collected requests.', '', 'text-green-400')}
+        `;
+
+        renderMetricsInsights(metrics, traces);
+    }
+
+    async function loadTraces() {
+        const traces = await (await fetch('/traces?limit=10')).json();
+        document.getElementById('traceTable').innerHTML = traces.map(t => `
+            <tr class="hover:bg-slate-800">
+                <td class="p-3">${t.traceId.substring(0, 8)}</td>
+                <td class="p-3">${t.model}</td>
+                <td class="p-3">${t.latency}</td>
+                <td class="p-3">${getScoreBadge(t.qualityScore)}</td>
+                <td class="p-3">${t.status}</td>
+                <td class="p-3">${t.totalTokens}</td>
+                <td class="p-3 text-green-400">$${t.cost?.toFixed(5) || 0}</td>
+            </tr>
+        `).join('');
+    }
+
+    function truncatePrompt(prompt) {
+        if (!prompt || !prompt.trim()) {
+            return 'Prompt unavailable';
+        }
+        return prompt.length > 120 ? `${prompt.slice(0, 120)}...` : prompt;
+    }
+
+    function renderInsightList(containerId, items, formatter) {
+        const container = document.getElementById(containerId);
+        if (!items.length) {
+            container.innerHTML = `<div class="p-4 text-sm text-slate-500">No requests available yet.</div>`;
+            return;
+        }
+
+        container.innerHTML = items.map(formatter).join('');
+    }
+
+    async function loadCostlyPrompts() {
+        const traces = await (await fetch('/traces/costly-prompts?limit=5')).json();
+        renderInsightList('costlyPrompts', traces, t => `
+            <div class="p-4">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <div class="text-sm font-medium text-white">${t.model}</div>
+                        <div class="mt-1 text-xs text-slate-400">${truncatePrompt(t.prompt)}</div>
+                        <div class="mt-2 text-xs">${getScoreBadge(t.qualityScore)}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-semibold text-emerald-400">$${t.cost?.toFixed(5) || '0.00000'}</div>
+                        <div class="mt-1 text-xs text-slate-500">${t.totalTokens || 0} tokens</div>
+                    </div>
+                </div>
+            </div>
+        `);
+    }
+
+    async function loadSlowRequests() {
+        const traces = await (await fetch('/traces/slow-requests?limit=5')).json();
+        renderInsightList('slowRequests', traces, t => `
+            <div class="p-4">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <div class="text-sm font-medium text-white">${t.model}</div>
+                        <div class="mt-1 text-xs text-slate-400">${truncatePrompt(t.prompt)}</div>
+                        <div class="mt-2 text-xs">${getScoreBadge(t.qualityScore)}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-semibold text-amber-300">${t.latency} ms</div>
+                        <div class="mt-1 text-xs text-slate-500">${t.status}</div>
+                    </div>
+                </div>
+            </div>
+        `);
+    }
+
+    let modelChart, latencyChart, timeChart, tokenChart;
+
+    async function loadModelChart() {
+        const data = await (await fetch('/traces/model-metrics')).json();
+        const ctx = document.getElementById('modelChart');
+        if (modelChart) modelChart.destroy();
+        modelChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(data),
+                datasets: [{ label: 'Requests', data: Object.values(data), backgroundColor: '#38bdf8', barThickness: 40 }]
+            },
+            options: { maintainAspectRatio: false }
+        });
+    }
+
+    async function loadLatencyChart() {
+        const traces = await (await fetch('/traces?limit=200')).json();
+        let f = 0, m = 0, s = 0;
+        traces.forEach(t => {
+            if (t.latency < 100) f++;
+            else if (t.latency < 500) m++;
+            else s++;
+        });
+        const data = [f, m, s];
+        if (!latencyChart) {
+            latencyChart = new Chart(document.getElementById('latencyChart').getContext('2d'), {
+                type: 'pie',
+                data: { labels: ['Fast', 'Medium', 'Slow'], datasets: [{ data }] },
+                options: { maintainAspectRatio: false, animation: { duration: 300 } }
+            });
+        } else {
+            latencyChart.data.datasets[0].data = data;
+            latencyChart.update();
+        }
+    }
+
+    async function loadTimeSeriesChart() {
+        const data = await (await fetch('/traces/time-series')).json();
+        const labels = Object.keys(data);
+        const values = Object.values(data);
+        if (!timeChart) {
+            timeChart = new Chart(document.getElementById('timeChart').getContext('2d'), {
+                type: 'line',
+                data: { labels, datasets: [{ label: 'Requests Over Time', data: values, borderColor: '#38bdf8', tension: 0.3 }] },
+                options: { maintainAspectRatio: false, animation: { duration: 300 } }
+            });
+        } else {
+            timeChart.data.labels = labels;
+            timeChart.data.datasets[0].data = values;
+            timeChart.update();
+        }
+    }
+
+    let lastTokenData = null;
+
+    async function loadTokenChart() {
+        const data = await (await fetch('/traces/model-analytics')).json();
+        if (JSON.stringify(data) === JSON.stringify(lastTokenData)) return;
+        lastTokenData = data;
+        const labels = Object.keys(data);
+        const tokens = Object.values(data).map(d => d.tokens);
+        const cost = Object.values(data).map(d => d.cost);
+        if (!tokenChart) {
+            tokenChart = new Chart(document.getElementById('tokenChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Tokens', data: tokens, borderColor: '#38bdf8', tension: 0.3 },
+                        { label: 'Cost ($)', data: cost, borderColor: '#22c55e', tension: 0.3 }
+                    ]
+                },
+                options: { maintainAspectRatio: false, animation: { duration: 300 } }
+            });
+        } else {
+            tokenChart.data.labels = labels;
+            tokenChart.data.datasets[0].data = tokens;
+            tokenChart.data.datasets[1].data = cost;
+            tokenChart.update('none');
+        }
+    }
+
+    function refresh() {
+        loadMetrics();
+        loadTraces();
+        loadCostlyPrompts();
+        loadSlowRequests();
+        loadModelChart();
+        loadLatencyChart();
+        loadTimeSeriesChart();
+        loadTokenChart();
+    }
+
+    async function logout() {
+        await fetch('/auth/logout', { method: 'POST' });
+        window.location.href = '/';
+    }
+
+    document.getElementById('logoutButton').addEventListener('click', logout);
+
+    ensureAuthenticated().then(() => {
+        refresh();
+        setInterval(refresh, 5000);
+    });
+</script>
+</body>
+</html>

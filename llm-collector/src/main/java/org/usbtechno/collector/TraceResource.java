@@ -1,134 +1,154 @@
 package org.usbtechno.collector;
 
-
-import jakarta.ws.rs.*;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.slf4j.LoggerFactory;
+import org.jboss.logging.Logger;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Logger;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Path("/traces")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class TraceResource {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(TraceResource.class);
-    private Logger logger = Logger.getLogger(TraceResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(TraceResource.class);
 
-    private static final AtomicLong requestCount = new AtomicLong();
-    private static final List<Trace> traces = Collections.synchronizedList(new ArrayList<>());
-
+    @Inject
+    TraceRepository traceRepository;
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response collectTrace(Trace trace) {
-        logger.info("RAW TRACE RECEIVED:");
+    @Transactional
+    public Response collectTrace(@Valid Trace trace) {
+        if (traceRepository.findByIdOptional(trace.traceId).isPresent()) {
+            throw new WebApplicationException("Trace with this traceId already exists", Response.Status.CONFLICT);
+        }
 
-        // INCREMENT HERE
-        requestCount.incrementAndGet();
-        traces.add(trace);
+        trace.qualityScore = HeuristicEvaluator.evaluate(trace.prompt == null ? "" : trace.prompt,
+                trace.response == null ? "" : trace.response);
 
-        logger.info("trace id: " + trace.traceId);
-        logger.info("latency: "  + trace.latency);
-        logger.info("prompt: "   + trace.prompt);
-        logger.info("status: "   + trace.status);
-        logger.info("model: "    + trace.model);
-        logger.info("total requests: "    + traces.size());
-        logger.info("token length:" + trace.tokenLength);
-        logger.info("response token:" + trace.responseTokens);
-        logger.info("prompt token:" + trace.promptTokens);
-        logger.info("cost :" + trace.cost);
-
-
-        return Response.ok().build();
+        traceRepository.persist(trace);
+        LOG.infov("Stored trace {0} for model {1}", trace.traceId, trace.model);
+        return Response.status(Response.Status.CREATED).entity(trace).build();
     }
 
-    // 🔥 METRICS ENDPOINT
+    @GET
+    public List<Trace> getRecentTraces(@QueryParam("limit") @DefaultValue("100") @Min(1) @Max(500) int limit) {
+        return traceRepository.findRecent(limit);
+    }
+
+    @GET
+    @Path("/costly-prompts")
+    public List<Trace> getCostlyPrompts(@QueryParam("limit") @DefaultValue("5") @Min(1) @Max(50) int limit) {
+        return traceRepository.findCostliest(limit);
+    }
+
+    @GET
+    @Path("/slow-requests")
+    public List<Trace> getSlowRequests(@QueryParam("limit") @DefaultValue("5") @Min(1) @Max(50) int limit) {
+        return traceRepository.findSlowest(limit);
+    }
+
+    @GET
+    @Path("/page")
+    public PagedTraceResponse getPagedTraces(@QueryParam("page") @DefaultValue("0") @Min(0) int page,
+                                             @QueryParam("size") @DefaultValue("25") @Min(1) @Max(200) int size,
+                                             @QueryParam("model") String model,
+                                             @QueryParam("status") String status,
+                                             @QueryParam("from") Long from,
+                                             @QueryParam("to") Long to) {
+        return traceRepository.findPage(page, size, model, status, from, to);
+    }
+
     @GET
     @Path("/metrics")
-    @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Object> getMetrics() {
+        List<Trace> traces = traceRepository.listAll();
         Map<String, Object> metrics = new HashMap<>();
 
-        long totalRequests = requestCount.get();
+        long totalRequests = traces.size();
         metrics.put("totalRequests", totalRequests);
 
-        // avg latency
         double avgLatency = traces.stream()
                 .mapToLong(t -> t.latency)
                 .average()
                 .orElse(0);
         metrics.put("avgLatency", avgLatency);
 
-        // p95 latency
         List<Long> latencies = traces.stream()
                 .map(t -> t.latency)
                 .sorted()
                 .toList();
 
-        if(latencies != null && latencies.size()>0) {
-            int index = (int) (0.95 * latencies.size());
-            long p95 = latencies.get(index);
-            metrics.put("p95", p95);
+        long p95 = 0;
+        if (!latencies.isEmpty()) {
+            int index = Math.min((int) Math.ceil(0.95 * latencies.size()) - 1, latencies.size() - 1);
+            p95 = latencies.get(Math.max(index, 0));
         }
+        metrics.put("p95", p95);
 
         long errorCount = traces.stream()
-                .filter(t -> "error".equals(t.status))
+                .filter(t -> "error".equalsIgnoreCase(t.status))
                 .count();
-
-        // error rate
-        double errorRate = (errorCount * 100.0) / totalRequests;
+        double errorRate = totalRequests == 0 ? 0 : (errorCount * 100.0) / totalRequests;
         metrics.put("errorRate", errorRate);
 
-        // total tokens
         long totalTokens = traces.stream()
-                .mapToLong(t -> t.tokenLength)
+                .mapToLong(t -> t.totalTokens > 0 ? t.totalTokens : t.tokenLength)
                 .sum();
         metrics.put("totalTokens", totalTokens);
 
-        // requests per model
-        Map<String, Long> requestsPerModel =
-                traces.stream()
-                        .collect(Collectors.groupingBy(
-                                t -> t.model,
-                                Collectors.counting()
-                        ));
-
+        Map<String, Long> requestsPerModel = traces.stream()
+                .collect(Collectors.groupingBy(t -> t.model, Collectors.counting()));
         metrics.put("requestsPerModel", requestsPerModel);
 
+        double totalCost = traces.stream()
+                .mapToDouble(t -> t.cost)
+                .sum();
+        metrics.put("totalCost", totalCost);
+
+        double avgQualityScore = traces.stream()
+                .filter(t -> t.qualityScore != null)
+                .mapToDouble(t -> t.qualityScore)
+                .average()
+                .orElse(0);
+        metrics.put("avgQualityScore", avgQualityScore);
         return metrics;
     }
 
     @GET
     @Path("/model-metrics")
-    @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Long> modelMetrics() {
-        return traces.stream()
-                .collect(Collectors.groupingBy(
-                        t -> t.model,
-                        Collectors.counting()
-                ));
-    }
-
-    @GET
-    @Path("")
-    public List<Trace> getTraces() {
-        return traces;
+        return traceRepository.listAll().stream()
+                .collect(Collectors.groupingBy(t -> t.model, Collectors.counting()));
     }
 
     @GET
     @Path("/time-series")
-    @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Long> timeSeries() {
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
-        return traces.stream()
+        return traceRepository.listAll().stream()
                 .collect(Collectors.groupingBy(
                         t -> Instant.ofEpochMilli(t.timestamp)
                                 .atZone(ZoneId.systemDefault())
@@ -138,5 +158,45 @@ public class TraceResource {
                 ));
     }
 
+    @GET
+    @Path("/model-analytics")
+    public Map<String, Map<String, Object>> modelAnalytics() {
+        Map<String, List<Trace>> grouped = traceRepository.listAll().stream()
+                .collect(Collectors.groupingBy(t -> t.model));
 
+        Map<String, Map<String, Object>> result = new HashMap<>();
+
+        for (Map.Entry<String, List<Trace>> entry : grouped.entrySet()) {
+            String model = entry.getKey();
+            List<Trace> list = entry.getValue();
+
+            int requests = list.size();
+            int totalTokens = list.stream()
+                    .mapToInt(t -> t.totalTokens)
+                    .sum();
+            double totalCost = list.stream()
+                    .mapToDouble(t -> t.cost)
+                    .sum();
+            double avgLatency = list.stream()
+                    .mapToLong(t -> t.latency)
+                    .average()
+                    .orElse(0);
+
+            Map<String, Object> metrics = new HashMap<>();
+            metrics.put("requests", requests);
+            metrics.put("tokens", totalTokens);
+            metrics.put("cost", totalCost);
+            metrics.put("avgLatency", avgLatency);
+            result.put(model, metrics);
+        }
+
+        return result.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey(Comparator.naturalOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (left, right) -> left,
+                        HashMap::new
+                ));
+    }
 }

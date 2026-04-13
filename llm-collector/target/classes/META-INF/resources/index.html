@@ -1,250 +1,269 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>TraceLM Dashboard</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TraceLM</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        canvas {
-            height: 260px !important;
-        }
-    </style>
 </head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+<div class="relative isolate overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.2),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(34,197,94,0.18),_transparent_25%)]"></div>
 
-<body class="bg-slate-950 text-slate-200">
-
-<div class="flex h-screen">
-
-    <!-- Sidebar -->
-    <aside class="w-64 bg-slate-900 border-r border-slate-800 p-6 hidden md:block">
-        <h1 class="text-xl font-bold text-blue-400 mb-8">🚀 TraceLM</h1>
-
-        <nav class="space-y-4 text-sm">
-            <div id="nav-dashboard" onclick="showSection('dashboard')" class="text-white cursor-pointer">
-                📊 Dashboard
-            </div>
-            <div id="nav-metrics" onclick="showSection('metrics')" class="text-slate-400 hover:text-white cursor-pointer">
-                📈 Metrics
-            </div>
-        </nav>
-    </aside>
-
-    <!-- Main -->
-    <main class="flex-1 p-6 overflow-y-auto">
-
-        <!-- ================= DASHBOARD ================= -->
-        <div id="dashboardSection">
-
-            <h2 class="text-2xl font-semibold mb-4">Dashboard</h2>
-
-            <!-- KPI -->
-            <div id="metrics" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6"></div>
-
-            <!-- Charts -->
-            <div class="grid md:grid-cols-2 gap-6 mb-6">
-
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 h-[300px]">
-                    <h3 class="text-sm text-slate-400 mb-2">Model Usage</h3>
-                    <canvas id="modelChart"></canvas>
-                </div>
-
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 h-[300px]">
-                    <h3 class="text-sm text-slate-400 mb-2">Latency Distribution</h3>
-                    <canvas id="latencyChart"></canvas>
-                </div>
-
-            </div>
-
-            <!-- Time -->
-            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 mb-6 h-[300px]">
-                <h3 class="text-sm text-slate-400 mb-2">Requests Over Time</h3>
-                <canvas id="timeChart"></canvas>
-            </div>
-
-            <!-- Recent Requests -->
-            <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-                <div class="p-4 border-b border-slate-800">
-                    <h3 class="text-sm text-slate-400">Recent Requests</h3>
-                </div>
-
-                <table class="w-full text-sm">
-                    <thead class="bg-slate-800 text-slate-400">
-                    <tr>
-                        <th class="p-3 text-left">TraceId</th>
-                        <th class="p-3 text-left">Model</th>
-                        <th class="p-3 text-left">Latency</th>
-                        <th class="p-3 text-left">Status</th>
-                        <th class="p-3 text-left">Tokens</th>
-                    </tr>
-                    </thead>
-                    <tbody id="traceTable"></tbody>
-                </table>
-            </div>
-
+    <header class="relative z-10 max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+        <a href="/" class="text-2xl font-bold tracking-tight text-sky-300">TraceLM</a>
+        <div id="navActions" class="flex gap-3">
+            <a href="/login.html" class="px-4 py-2 text-sm text-slate-200 border border-slate-700 rounded-full hover:border-sky-400 hover:text-white transition">Login</a>
+            <a href="/signup.html" class="px-4 py-2 text-sm bg-sky-400 text-slate-950 rounded-full font-semibold hover:bg-sky-300 transition">Create account</a>
         </div>
+    </header>
 
-        <!-- ================= METRICS PAGE ================= -->
-        <div id="metricsSection" class="hidden">
-
-            <h2 class="text-2xl font-semibold mb-6">📈 Metrics Insights</h2>
-
-            <!-- Summary -->
-            <div id="metricsDetails" class="grid md:grid-cols-3 gap-4 mb-6"></div>
-
-            <!-- Request Insights -->
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 mb-6">
-                <h3 class="text-lg mb-3">📊 Request Insights</h3>
-                <div id="requestInsights" class="text-slate-400 text-sm"></div>
+    <main class="relative z-10 max-w-7xl mx-auto px-6 pt-8 pb-20">
+        <section class="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-400/10 px-4 py-2 text-sm text-sky-200">
+                    LLM observability for teams shipping in production
+                </div>
+                <h1 class="mt-6 text-5xl md:text-6xl font-semibold tracking-tight leading-tight">
+                    See every request, cost spike, and latency regression before your users do.
+                </h1>
+                <p class="mt-6 text-lg text-slate-300 max-w-2xl">
+                    TraceLM gives your team a live view into model usage, token spend, performance tails, and request-level history from one dashboard.
+                </p>
+                <p class="mt-4 text-base text-slate-400 max-w-2xl">
+                    Whether you are running customer support copilots, internal assistants, retrieval workflows, or structured LLM pipelines,
+                    TraceLM helps you answer the questions that leadership, engineering, and operations always ask: Which model is driving cost?
+                    Which prompts are underperforming? Where are users waiting too long? What changed after the last release?
+                </p>
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <a id="primaryCta" href="/signup.html" class="px-6 py-3 rounded-full bg-sky-400 text-slate-950 font-semibold hover:bg-sky-300 transition">Start free</a>
+                    <a href="/login.html" class="px-6 py-3 rounded-full border border-slate-700 text-slate-100 hover:border-sky-400 transition">Sign in</a>
+                </div>
+                <div class="mt-8 grid sm:grid-cols-3 gap-4">
+                    <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                        <div class="text-2xl font-semibold text-white">99.9%</div>
+                        <div class="mt-2 text-sm text-slate-400">Operational visibility goal for request monitoring and failure detection.</div>
+                    </div>
+                    <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                        <div class="text-2xl font-semibold text-white">Model-by-model</div>
+                        <div class="mt-2 text-sm text-slate-400">Understand spend, quality, and latency across every provider and prompt flow.</div>
+                    </div>
+                    <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                        <div class="text-2xl font-semibold text-white">Live dashboard</div>
+                        <div class="mt-2 text-sm text-slate-400">Move from reactive debugging to proactive operational monitoring.</div>
+                    </div>
+                </div>
+                <div class="mt-8 grid sm:grid-cols-3 gap-4 text-sm">
+                    <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                        <div class="text-slate-400">Latency visibility</div>
+                        <div class="mt-2 text-white font-semibold">P95 and real-time trend views</div>
+                    </div>
+                    <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                        <div class="text-slate-400">Cost monitoring</div>
+                        <div class="mt-2 text-white font-semibold">Token and spend analytics by model</div>
+                    </div>
+                    <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                        <div class="text-slate-400">Request drill-downs</div>
+                        <div class="mt-2 text-white font-semibold">Recent traces at a glance</div>
+                    </div>
+                </div>
             </div>
 
-        </div>
+            <div class="rounded-[28px] border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-sky-950/30">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm">Live Preview</p>
+                        <h2 class="text-2xl font-semibold mt-1">Operational snapshot</h2>
+                    </div>
+                    <span class="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-sm text-emerald-300">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        Healthy
+                    </span>
+                </div>
+                <div class="mt-6 grid grid-cols-2 gap-4">
+                    <div class="rounded-2xl bg-slate-800/80 p-4">
+                        <div class="text-slate-400 text-sm">Requests</div>
+                        <div class="mt-2 text-3xl font-semibold">12.4k</div>
+                    </div>
+                    <div class="rounded-2xl bg-slate-800/80 p-4">
+                        <div class="text-slate-400 text-sm">Avg Latency</div>
+                        <div class="mt-2 text-3xl font-semibold">184 ms</div>
+                    </div>
+                    <div class="rounded-2xl bg-slate-800/80 p-4">
+                        <div class="text-slate-400 text-sm">P95</div>
+                        <div class="mt-2 text-3xl font-semibold">620 ms</div>
+                    </div>
+                    <div class="rounded-2xl bg-slate-800/80 p-4">
+                        <div class="text-slate-400 text-sm">Cost</div>
+                        <div class="mt-2 text-3xl font-semibold text-emerald-400">$321</div>
+                    </div>
+                </div>
+                <div class="mt-6 rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                    <div class="flex items-center justify-between text-sm text-slate-400">
+                        <span>Top model</span>
+                        <span>Traffic share</span>
+                    </div>
+                    <div class="mt-3 flex items-center justify-between">
+                        <span class="font-medium text-white">gpt-4o-mini</span>
+                        <span class="text-sky-300">61.7%</span>
+                    </div>
+                    <div class="mt-3 h-2 rounded-full bg-slate-800 overflow-hidden">
+                        <div class="h-full w-[62%] bg-gradient-to-r from-sky-400 to-emerald-400 rounded-full"></div>
+                    </div>
+                </div>
+                <div class="mt-6 rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-slate-400">Quality monitoring</p>
+                            <p class="mt-1 text-lg font-semibold text-white">Response quality trends by request</p>
+                        </div>
+                        <span class="text-sm text-emerald-300">Avg score 0.82</span>
+                    </div>
+                    <p class="mt-3 text-sm text-slate-400">
+                        TraceLM surfaces heuristic quality signals alongside cost and latency so teams can spot degraded responses before they become support escalations.
+                    </p>
+                </div>
+            </div>
+        </section>
 
+        <section class="mt-20 grid lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 rounded-[28px] border border-slate-800 bg-slate-900/70 p-8">
+                <p class="text-sm uppercase tracking-[0.2em] text-sky-300">Why Teams Use TraceLM</p>
+                <h2 class="mt-4 text-3xl font-semibold text-white">Built for the operational reality of production LLM systems</h2>
+                <p class="mt-4 text-slate-400 leading-7">
+                    LLM features rarely fail in obvious ways. They drift. They slow down. Costs creep upward. A prompt that worked last week starts
+                    producing shorter answers, weaker structure, or increased fallback responses. TraceLM is designed to make those shifts visible with
+                    request-level detail, quality scoring, and a concise operations dashboard your team can actually use day to day.
+                </p>
+                <div class="mt-8 grid md:grid-cols-2 gap-5">
+                    <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                        <h3 class="text-white font-semibold">For engineering teams</h3>
+                        <p class="mt-2 text-sm text-slate-400">
+                            Monitor latency distributions, identify the slowest requests, compare model behavior, and quickly connect operational issues to actual traffic.
+                        </p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                        <h3 class="text-white font-semibold">For platform and ops</h3>
+                        <p class="mt-2 text-sm text-slate-400">
+                            Track spend, request throughput, outlier prompts, retention windows, and overall service health from a single control surface.
+                        </p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                        <h3 class="text-white font-semibold">For product leaders</h3>
+                        <p class="mt-2 text-sm text-slate-400">
+                            Measure whether the system is becoming faster, more expensive, or lower quality over time, without waiting for anecdotal feedback.
+                        </p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                        <h3 class="text-white font-semibold">For responsible rollout</h3>
+                        <p class="mt-2 text-sm text-slate-400">
+                            Compare prompt and model changes with confidence by keeping a historical view of request behavior, token usage, and quality signals.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rounded-[28px] border border-slate-800 bg-slate-900/70 p-8">
+                <p class="text-sm uppercase tracking-[0.2em] text-emerald-300">Confidence Signals</p>
+                <div class="mt-6 space-y-5 text-sm">
+                    <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                        <div class="text-white font-semibold">Request-level visibility</div>
+                        <p class="mt-2 text-slate-400">Inspect individual prompts, responses, token counts, latency, cost, and quality score together.</p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                        <div class="text-white font-semibold">Persistent storage</div>
+                        <p class="mt-2 text-slate-400">Trace data, users, sessions, and migrations are stored in PostgreSQL for durable operational history.</p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                        <div class="text-white font-semibold">Protected access</div>
+                        <p class="mt-2 text-slate-400">Signup, login, logout, session-based dashboard access, and optional API-key support are built in.</p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                        <div class="text-white font-semibold">Operational metrics</div>
+                        <p class="mt-2 text-slate-400">View requests, P95, error rate, total tokens, total cost, slow requests, costly prompts, and quality trends.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-20 rounded-[32px] border border-slate-800 bg-slate-900/75 p-8 md:p-10">
+            <div class="grid lg:grid-cols-2 gap-10">
+                <div>
+                    <p class="text-sm uppercase tracking-[0.2em] text-sky-300">How It Works</p>
+                    <h2 class="mt-4 text-3xl font-semibold text-white">From raw LLM traffic to an operational control plane</h2>
+                    <div class="mt-8 space-y-5">
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                            <div class="text-white font-semibold">1. Collect request traces</div>
+                            <p class="mt-2 text-sm text-slate-400">Send request metadata, token counts, prompts, responses, status, latency, and cost into the collector.</p>
+                        </div>
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                            <div class="text-white font-semibold">2. Score and enrich responses</div>
+                            <p class="mt-2 text-sm text-slate-400">TraceLM computes heuristic quality signals and organizes request data into actionable metrics and insights.</p>
+                        </div>
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                            <div class="text-white font-semibold">3. Monitor live behavior</div>
+                            <p class="mt-2 text-sm text-slate-400">Use the dashboard to detect regressions, inspect slow or expensive requests, and track quality over time.</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm uppercase tracking-[0.2em] text-emerald-300">What You Can Answer</p>
+                    <div class="mt-8 space-y-4">
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                            <div class="text-white font-semibold">Why did my LLM bill jump this week?</div>
+                            <p class="mt-2 text-sm text-slate-400">See the most expensive prompts, model-level cost totals, and request patterns contributing to spend.</p>
+                        </div>
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                            <div class="text-white font-semibold">Which requests are hurting user experience?</div>
+                            <p class="mt-2 text-sm text-slate-400">Identify the slowest requests, watch P95 latency, and review the affected prompts and models.</p>
+                        </div>
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                            <div class="text-white font-semibold">Did response quality degrade after a rollout?</div>
+                            <p class="mt-2 text-sm text-slate-400">Compare quality signals and recent traces to see whether outputs became weaker, shorter, or less relevant.</p>
+                        </div>
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                            <div class="text-white font-semibold">Which model is actually performing best for this workload?</div>
+                            <p class="mt-2 text-sm text-slate-400">Cross-check request share, latency, cost, token usage, and quality score before making a model decision.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-20 text-center max-w-4xl mx-auto">
+            <p class="text-sm uppercase tracking-[0.2em] text-sky-300">Get Started</p>
+            <h2 class="mt-4 text-4xl font-semibold text-white">Bring observability to your LLM stack before scale makes it painful.</h2>
+            <p class="mt-4 text-slate-400 text-lg">
+                Start with a single app or rollout, connect your traces, and give your team a shared view of performance, cost, and quality from day one.
+            </p>
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+                <a href="/signup.html" class="px-6 py-3 rounded-full bg-sky-400 text-slate-950 font-semibold hover:bg-sky-300 transition">Create your account</a>
+                <a href="/login.html" class="px-6 py-3 rounded-full border border-slate-700 text-slate-100 hover:border-sky-400 transition">Open existing workspace</a>
+            </div>
+        </section>
     </main>
 </div>
 
 <script>
-
-    function showSection(section) {
-        document.getElementById('dashboardSection').classList.add('hidden');
-        document.getElementById('metricsSection').classList.add('hidden');
-
-        document.getElementById('nav-dashboard').classList.remove('text-white');
-        document.getElementById('nav-metrics').classList.remove('text-white');
-
-        if (section === 'dashboard') {
-            document.getElementById('dashboardSection').classList.remove('hidden');
-            document.getElementById('nav-dashboard').classList.add('text-white');
-        }
-
-        if (section === 'metrics') {
-            document.getElementById('metricsSection').classList.remove('hidden');
-            document.getElementById('nav-metrics').classList.add('text-white');
-        }
-    }
-
-    async function loadMetrics() {
-        const data = await (await fetch('/traces/metrics')).json();
-
-        // KPI Cards
-        document.getElementById('metrics').innerHTML = `
-            <div class="card">Requests<br>${data.totalRequests}</div>
-            <div class="card">Avg Latency<br>${data.avgLatency.toFixed(2)} ms</div>
-            <div class="card">P95<br>${data.p95} ms</div>
-            <div class="card">Error Rate<br>${data.errorRate}%</div>
-            <div class="card">Tokens<br>${data.totalTokens}</div>
-        `;
-
-        // Metrics page details
-        document.getElementById('metricsDetails').innerHTML = `
-            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                <div>Total Requests</div>
-                <div class="text-xl font-bold">${data.totalRequests}</div>
-            </div>
-
-            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                <div>Avg Latency</div>
-                <div class="text-xl font-bold">${data.avgLatency.toFixed(2)} ms</div>
-            </div>
-
-            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                <div>P95</div>
-                <div class="text-xl font-bold">${data.p95} ms</div>
-            </div>
-        `;
-    }
-
-    async function loadTraces() {
-        const traces = await (await fetch('/traces')).json();
-
-        // Table
-        document.getElementById('traceTable').innerHTML =
-            traces.slice(-10).reverse().map(t => `
-                <tr class="hover:bg-slate-800">
-                    <td class="p-3">${t.traceId.substring(0,8)}</td>
-                    <td class="p-3">${t.model}</td>
-                    <td class="p-3">${t.latency}</td>
-                    <td class="p-3 ${t.status==='error'?'text-red-400':'text-green-400'}">${t.status}</td>
-                    <td class="p-3">${t.tokenLength}</td>
-                </tr>
-            `).join('');
-
-        // Insights
-        const avg = traces.reduce((a,b)=>a+b.latency,0)/traces.length || 0;
-
-        document.getElementById('requestInsights').innerHTML = `
-            Total Requests: ${traces.length} <br>
-            Average Latency: ${avg.toFixed(2)} ms <br>
-            Slow Requests (>500ms): ${traces.filter(t=>t.latency>500).length}
-        `;
-    }
-
-    let modelChart, latencyChart, timeChart;
-
-    async function loadModelChart() {
-        const data = await (await fetch('/traces/model-metrics')).json();
-        const ctx = document.getElementById('modelChart').getContext('2d');
-
-        if (modelChart) modelChart.destroy();
-
-        modelChart = new Chart(ctx, {
-            type:'bar',
-            data:{ labels:Object.keys(data), datasets:[{label:'Requests per Model',data:Object.values(data), backgroundColor:'#38bdf8', barThickness: 40,           // ✅ fixed width
-            maxBarThickness: 50}] },
-            options:{ maintainAspectRatio:false, scales: {
-            x: {
-                offset: true           // ✅ centers single bar nicely
-            },
-            y: {
-                beginAtZero: true
+    async function loadSession() {
+        try {
+            const response = await fetch('/auth/me');
+            if (!response.ok) {
+                return;
             }
-        } }
-        });
+
+            const user = await response.json();
+            document.getElementById('navActions').innerHTML = `
+                <a href="/dashboard.html" class="px-4 py-2 text-sm bg-sky-400 text-slate-950 rounded-full font-semibold hover:bg-sky-300 transition">Open dashboard</a>
+            `;
+            document.getElementById('primaryCta').href = '/dashboard.html';
+            document.getElementById('primaryCta').textContent = `Continue as ${user.name}`;
+        } catch (error) {
+            console.error('Unable to load session', error);
+        }
     }
 
-    async function loadLatencyChart() {
-        const traces = await (await fetch('/traces')).json();
-
-        let f=0,m=0,s=0;
-        traces.forEach(t=>t.latency<100?f++:t.latency<500?m++:s++);
-
-        const ctx = document.getElementById('latencyChart').getContext('2d');
-
-        if (latencyChart) latencyChart.destroy();
-
-        latencyChart = new Chart(ctx,{
-            type:'pie',
-            data:{ labels:['Fast','Medium','Slow'], datasets:[{data:[f,m,s]}] },
-            options:{ maintainAspectRatio:false }
-        });
-    }
-
-    async function loadTimeSeriesChart() {
-        const data = await (await fetch('/traces/time-series')).json();
-        const ctx = document.getElementById('timeChart').getContext('2d');
-
-        if (timeChart) timeChart.destroy();
-
-        timeChart = new Chart(ctx,{
-            type:'line',
-            data:{ labels:Object.keys(data), datasets:[{label: 'Requests Over Time', data:Object.values(data), borderColor:'#38bdf8'}] },
-            options:{ maintainAspectRatio:false }
-        });
-    }
-
-    function refresh() {
-        loadMetrics();
-        loadTraces();
-        loadModelChart();
-        loadLatencyChart();
-        loadTimeSeriesChart();
-    }
-
-    refresh();
-    setInterval(refresh,5000);
-
+    loadSession();
 </script>
-
 </body>
 </html>

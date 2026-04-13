@@ -58,7 +58,7 @@ public class ResponseAdvice {
                         promptTokens,
                         responseTokens
                 );
-
+                logger.info("what is the cost for this request->" + cost);
                 trace.response = responseText;
                 trace.promptTokens = promptTokens;
                 trace.responseTokens = responseTokens;
@@ -101,7 +101,7 @@ public class ResponseAdvice {
       "promptTokens":%d,
       "responseTokens":%d,
       "totalTokens":%d,
-      "cost":%f
+      "cost":%.4f
     }
     """.formatted(
                 trace.traceId,
