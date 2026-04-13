@@ -7,6 +7,7 @@
 
 ![TraceLM Banner](banner.png)
 
+![TraceLM LandingPage](landing_page.png)
 
 ![TraceLM Dashboard](gui-2.png)
 
