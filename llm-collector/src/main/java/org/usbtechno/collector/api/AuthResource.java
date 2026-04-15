@@ -1,4 +1,4 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.api;
 
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -12,6 +12,11 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
+import org.usbtechno.collector.auth.AuthService;
+import org.usbtechno.collector.auth.dto.AuthUserResponse;
+import org.usbtechno.collector.auth.dto.LoginRequest;
+import org.usbtechno.collector.auth.dto.SignupRequest;
+import org.usbtechno.collector.domain.UserAccount;
 
 @Path("/auth")
 @Consumes(MediaType.APPLICATION_JSON)

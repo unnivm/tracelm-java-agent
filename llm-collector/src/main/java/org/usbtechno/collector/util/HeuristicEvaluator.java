@@ -1,4 +1,4 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.util;
 
 import java.util.*;
 import java.util.stream.*;

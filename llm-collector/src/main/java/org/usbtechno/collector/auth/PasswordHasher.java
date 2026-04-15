@@ -1,4 +1,4 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.auth;
 
 import jakarta.enterprise.context.ApplicationScoped;
 

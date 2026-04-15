@@ -1,4 +1,6 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.auth.dto;
+
+import org.usbtechno.collector.domain.UserAccount;
 
 public class AuthUserResponse {
 

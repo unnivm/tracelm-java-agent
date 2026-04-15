@@ -1,14 +1,10 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public class SignupRequest {
-
-    @NotBlank(message = "name is required")
-    @Size(max = 120, message = "name must be 120 characters or fewer")
-    public String name;
+public class LoginRequest {
 
     @NotBlank(message = "email is required")
     @Email(message = "email must be valid")

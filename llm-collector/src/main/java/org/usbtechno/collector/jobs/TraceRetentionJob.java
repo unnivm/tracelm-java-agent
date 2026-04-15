@@ -1,4 +1,4 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.jobs;
 
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -6,6 +6,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
+import org.usbtechno.collector.repository.TraceRepository;
 
 @ApplicationScoped
 public class TraceRetentionJob {

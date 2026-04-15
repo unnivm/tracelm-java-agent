@@ -1,4 +1,4 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.exception;
 
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.core.Context;
@@ -6,6 +6,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
+import org.usbtechno.collector.dto.ApiError;
 
 import java.util.stream.Collectors;
 

@@ -1,4 +1,6 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.dto;
+
+import org.usbtechno.collector.domain.Trace;
 
 import java.util.List;
 

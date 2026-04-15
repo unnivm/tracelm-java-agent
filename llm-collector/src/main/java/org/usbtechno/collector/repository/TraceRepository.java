@@ -1,10 +1,12 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
+import org.usbtechno.collector.domain.Trace;
+import org.usbtechno.collector.dto.PagedTraceResponse;
 
 import java.util.ArrayList;
 import java.util.List;

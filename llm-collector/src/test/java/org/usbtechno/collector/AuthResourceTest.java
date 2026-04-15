@@ -8,6 +8,9 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.usbtechno.collector.auth.AuthService;
+import org.usbtechno.collector.repository.UserAccountRepository;
+import org.usbtechno.collector.repository.UserSessionRepository;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;

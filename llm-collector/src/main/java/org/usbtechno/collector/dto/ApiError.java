@@ -1,4 +1,4 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.dto;
 
 import java.time.Instant;
 

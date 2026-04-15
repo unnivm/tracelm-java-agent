@@ -1,4 +1,4 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.api;
 
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -16,6 +16,10 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
+import org.usbtechno.collector.domain.Trace;
+import org.usbtechno.collector.dto.PagedTraceResponse;
+import org.usbtechno.collector.repository.TraceRepository;
+import org.usbtechno.collector.util.HeuristicEvaluator;
 
 import java.time.Instant;
 import java.time.ZoneId;

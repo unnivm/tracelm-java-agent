@@ -1,4 +1,4 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.domain;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;

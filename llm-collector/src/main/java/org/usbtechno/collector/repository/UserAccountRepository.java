@@ -1,7 +1,8 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.repository;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
+import org.usbtechno.collector.domain.UserAccount;
 
 import java.util.Optional;
 

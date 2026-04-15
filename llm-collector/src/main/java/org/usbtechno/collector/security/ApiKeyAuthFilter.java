@@ -1,4 +1,4 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.security;
 
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -11,6 +11,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.usbtechno.collector.auth.AuthService;
 
 import java.io.IOException;
 import java.util.Map;

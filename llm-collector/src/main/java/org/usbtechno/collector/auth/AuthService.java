@@ -1,4 +1,4 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.auth;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -7,6 +7,12 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.usbtechno.collector.auth.dto.AuthUserResponse;
+import org.usbtechno.collector.auth.dto.SignupRequest;
+import org.usbtechno.collector.domain.UserAccount;
+import org.usbtechno.collector.domain.UserSession;
+import org.usbtechno.collector.repository.UserAccountRepository;
+import org.usbtechno.collector.repository.UserSessionRepository;
 
 import java.time.Duration;
 import java.time.Instant;

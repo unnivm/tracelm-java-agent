@@ -1,4 +1,4 @@
-package org.usbtechno.collector;
+package org.usbtechno.collector.exception;
 
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.UriInfo;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 import org.jboss.logging.Logger;
+import org.usbtechno.collector.dto.ApiError;
 
 @Provider
 public class GenericExceptionMapper implements ExceptionMapper<Exception> {
