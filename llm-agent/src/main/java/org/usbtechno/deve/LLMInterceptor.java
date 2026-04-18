@@ -1,6 +1,5 @@
 package org.usbtechno.deve;
 
-
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 
