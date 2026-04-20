@@ -81,6 +81,10 @@ public class Trace extends PanacheEntityBase {
     @Column(name = "quality_score")
     public Double qualityScore;
 
+    @PositiveOrZero(message = "evaluationScore must be non-negative")
+    @Column(name = "evaluation_score")
+    public Double evaluationScore;
+
     @PrePersist
     void prePersist() {
         if (timestamp <= 0) {

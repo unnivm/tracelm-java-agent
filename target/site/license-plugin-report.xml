@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="FORMAT" timestamp="1776488630059">
+    <module artifactId="llm-observability-java-1" groupId="org.usbtechno.deve" version="1.0-SNAPSHOT"/>
+    <files>
+        <file path="src/main/java/org/usbtechno/deve/Main.java" result="REPLACED"/>
+    </files>
+</licensePluginReport>

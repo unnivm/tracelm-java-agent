@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licensePluginReport goal="FORMAT" timestamp="1776488630258">
+    <module artifactId="llm-collector" groupId="org.usbtechno.collector" version="1.0-SNAPSHOT"/>
+    <files>
+        <file path="src/main/java/org/usbtechno/collector/Main.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/api/AuthResource.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/api/TraceResource.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/auth/AuthService.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/auth/PasswordHasher.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/auth/dto/AuthUserResponse.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/auth/dto/LoginRequest.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/auth/dto/SignupRequest.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/domain/Trace.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/domain/UserAccount.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/domain/UserSession.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/dto/ApiError.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/dto/PagedTraceResponse.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/exception/ConstraintViolationExceptionMapper.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/exception/GenericExceptionMapper.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/jobs/TraceRetentionJob.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/repository/TraceRepository.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/repository/UserAccountRepository.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/repository/UserSessionRepository.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/security/ApiKeyAuthFilter.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/security/SessionAuthFilter.java" result="REPLACED"/>
+        <file path="src/main/java/org/usbtechno/collector/util/HeuristicEvaluator.java" result="REPLACED"/>
+        <file path="src/test/java/org/usbtechno/collector/ApiKeyProtectedTraceResourceProfile.java" result="REPLACED"/>
+        <file path="src/test/java/org/usbtechno/collector/ApiKeyProtectedTraceResourceTest.java" result="REPLACED"/>
+        <file path="src/test/java/org/usbtechno/collector/AuthResourceTest.java" result="REPLACED"/>
+        <file path="src/test/java/org/usbtechno/collector/TraceResourceTest.java" result="REPLACED"/>
+    </files>
+</licensePluginReport>

@@ -62,8 +62,10 @@ public class TraceResource {
             throw new WebApplicationException("Trace with this traceId already exists", Response.Status.CONFLICT);
         }
 
-        trace.qualityScore = HeuristicEvaluator.evaluate(trace.prompt == null ? "" : trace.prompt,
+        double evaluationScore = HeuristicEvaluator.evaluate(trace.prompt == null ? "" : trace.prompt,
                 trace.response == null ? "" : trace.response);
+        trace.evaluationScore = evaluationScore;
+        trace.qualityScore = evaluationScore;
 
         traceRepository.persist(trace);
         LOG.infov("Stored trace {0} for model {1}", trace.traceId, trace.model);
@@ -151,6 +153,13 @@ public class TraceResource {
                 .average()
                 .orElse(0);
         metrics.put("avgQualityScore", avgQualityScore);
+
+        double avgEvaluationScore = traces.stream()
+                .filter(t -> t.evaluationScore != null)
+                .mapToDouble(t -> t.evaluationScore)
+                .average()
+                .orElse(0);
+        metrics.put("avgEvaluationScore", avgEvaluationScore);
         return metrics;
     }
 
@@ -217,6 +226,18 @@ public class TraceResource {
                         HashMap::new
                 ));
     }
+
+//    @Path("/traces/quality-trend")
+//    @GET
+//    public Map<String, Double> qualityTrend() {
+//        List<Trace> traces = traceRepository.listAll();
+//        return traces.stream()
+//                .collect(Collectors.groupingBy(
+//                        t -> formatMinute(t.timestamp), // group by time
+//                        TreeMap::new,
+//                        Collectors.averagingDouble(t -> t.evaluationScore)
+//                ));
+//    }
 
     private String formatMinute(long timestamp) {
         return Instant.ofEpochMilli(timestamp)

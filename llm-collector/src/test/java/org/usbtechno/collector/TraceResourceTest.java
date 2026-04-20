@@ -66,7 +66,8 @@ class TraceResourceTest {
                 .then()
                 .statusCode(201)
                 .body("traceId", equalTo("trace-1"))
-                .body("qualityScore", notNullValue());
+                .body("qualityScore", notNullValue())
+                .body("evaluationScore", notNullValue());
 
         given()
                 .when()
@@ -76,6 +77,7 @@ class TraceResourceTest {
                 .body("totalRequests", equalTo(1))
                 .body("avgLatency", notNullValue())
                 .body("avgQualityScore", notNullValue())
+                .body("avgEvaluationScore", notNullValue())
                 .body("totalTokens", equalTo(40))
                 .body("totalCost", notNullValue());
     }
